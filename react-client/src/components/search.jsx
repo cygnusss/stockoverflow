@@ -21,7 +21,7 @@ class Search extends React.Component {
   }
 
   render() {
-    return (<div>
+    return (<div id="search_div">
       <input value={this.state.q} onChange={this.onChange.bind(this)}/>
       <button onClick={this.search.bind(this)}>BE RICH</button>
     </div>) 

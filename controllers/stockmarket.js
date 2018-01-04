@@ -101,9 +101,15 @@ module.exports = {
             const parsedStockData = JSON.parse(targetStockRowData);
             const properStockData = parseDailyDataObject(parsedStockData);
 
-            db.saveIntoDatabase(properStockData);
-            resp.writeHead(201, {'Content-Type': 'application/json'});
-            resp.end(JSON.stringify(properStockData));
+            db.saveIntoDatabase(properStockData)
+              .then(results => {
+                if (results.length) {
+                  resp.writeHead(201, {'Content-Type': 'application/json'});
+                  resp.end(JSON.stringify(results));
+                }
+              })
+              resp.writeHead(201, {'Content-Type': 'application/json'});
+              resp.end(JSON.stringify(properStockData));
           } 
           else {
             resp.writeHead(404, {'Content-Type': 'text/plain'});

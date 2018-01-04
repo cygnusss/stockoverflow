@@ -9,6 +9,8 @@ const newsSchema = new Schema({
   keyword: String
 });
 
+// mongoose.Article.remove()
+
 const Article = mongoose.model('Article', newsSchema);
 
 const searchDatabase = inputKeyword => {
@@ -30,13 +32,14 @@ const createNewArticle = inputNews => {
 };
 
 const saveIntoDatabase = inputNews => {
-  searchDatabase(inputNews.keyword)
-    .then(found => {
-      if (!found) {
+  // searchDatabase(inputNews.keyword)
+  //   .then(found => {
+  //     if (!found) {
+  //       console.log('new article created')
         const newartcile = createNewArticle(inputNews);
         newartcile.save();
-      }
-    })
+    //   }
+    // })
 };
 
 module.exports.Article = Article;

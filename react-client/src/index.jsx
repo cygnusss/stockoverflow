@@ -1,4 +1,3 @@
-// const request = require('request');
 import React from 'react';
 import ReactDOM from 'react-dom';
 import $ from 'jquery';
@@ -20,22 +19,14 @@ class App extends React.Component {
       type: "DAILY",
       priceDate: undefined
     };
-    $.post('http://127.0.0.1:8080/renderStock', data)
-      .done(data => {
-        console.log("THIS IS DATAAAAA")
-        console.log(data);
-      })
-    $.get('http://127.0.0.1:8080/renderStock', {name: q})
-      .done((data) => {
-        this.setState({
-          q: data
-        });
+    $.post('http://127.0.0.1:8080/renderStock', data, data => {
+      this.setState({
+        q: data
       });
-    $.post('http://127.0.0.1:8080/renderNews', data);
+    });
+    // $.post('http://127.0.0.1:8080/renderNews', data);
     $.get('http://127.0.0.1:8080/renderNews', {name: q})
       .done((data) => {
-        console.log("ARTICLES");
-        console.log(data);
         this.setState({
           articles: data
         });
@@ -54,7 +45,7 @@ class App extends React.Component {
 
   render () {
     return (
-    <div>
+    <div id="main_app">
       <Search onSearch={this.handleInput.bind(this)}/>
       <h1> NAME: {this.state.q.name} </h1>
       <h4>OPENENING: ${this.state.q.openingPrice} </h4>

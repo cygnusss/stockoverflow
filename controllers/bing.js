@@ -3,8 +3,9 @@ const Promise = require('bluebird');
 const request = require('request');
 const db = require('../database/newsDB.js');
 const _ = require('underscore');
-
+console.log("BING")
 const searchApiForArticle = keyword => {
+  console.log("SEARCH FOR API")
   return new Promise((resolve, reject) => {
     const options = {
       "method": "GET",
@@ -24,6 +25,8 @@ const queryDatabase = keyword => {
   return new Promise((resolve, reject) => {
     db.Article.find({keyword: keyword}, (err, found) => {
       if (found) resolve(found);
+      console.log('QUERY RESPONSE')
+      console.log(found)
       reject(err || found);
     });
   });
@@ -41,48 +44,85 @@ const parseArticleObject = (article, keyword) => {
 
 module.exports = {
   get: (req, resp) => {
+    console.log("GET REQUEST RECEIVED")
     const keyword = req.query.name.toUpperCase();
-    queryDatabase(keyword)
-      .then(targetSubjectArray => {
+
+    searchApiForArticle(keyword)
+    .then(queryResults => {
+      if (queryResults) {
+        const parsedQueryResults = JSON.parse(queryResults);
+        const arrayOfArticles = parsedQueryResults.value;
+        
+        return _.reduce(arrayOfArticles, (articles, currArticle) => {
+          if (currArticle.image) {
+            const parsedObject = parseArticleObject(currArticle, keyword);
+            articles.push(parsedObject);
+          }
+          return articles;
+        }, []);
+      } 
+      else return null;
+    })
+    .then(arrayOfArticles => {
+      // console.log('ARRAY')
+      // console.log(arrayOfArticles)
+      if (arrayOfArticles) {
+        // for (const article of arrayOfArticles) {
+        //   db.saveIntoDatabase(article);
+        // }
         resp.writeHead(200, {"Content-Type": "application/json"});
-        resp.end(JSON.stringify(targetSubjectArray));
-      })
-      .catch(err => console.error(err));
+        resp.end(JSON.stringify(arrayOfArticles));
+      }
+    })
+
+    // queryDatabase(keyword)
+    //   .then(targetSubjectArray => {
+    //     resp.writeHead(200, {"Content-Type": "application/json"});
+    //     resp.end(JSON.stringify(targetSubjectArray));
+    //   })
+    //   .catch(err => console.error(err));
   },
 
-  post: (req, resp) => {
-    const keyword = req.body.name.toUpperCase();
+  // post: (req, resp) => {
+  //   console.log("POST REQUEST RECEIVED")
+  //   const keyword = req.body.name.toUpperCase();
+  //   console.log("KEYWORD:", keyword);
 
-    db.searchDatabase(keyword)
-      .then(databaseQueryResult => {
-        return !databaseQueryResult ? searchApiForArticle(keyword) : null;
-      })    
-      .then(queryResults => {
-        if (queryResults) {
-          const parsedQueryResults = JSON.parse(queryResults);
-          const arrayOfArticles = parsedQueryResults.value;
+  //   // db.searchDatabase(keyword)
+  //   //   .then(databaseQueryResult => {
+  //   //     console.log("DATABASE RESPONSE")
+  //   //     console.log(databaseQueryResult)
+  //   //     return !databaseQueryResult ? searchApiForArticle(keyword) : null;
+  //   //   })    
+  //     searchApiForArticle(keyword)
+  //     .then(queryResults => {
+  //       if (queryResults) {
+  //         const parsedQueryResults = JSON.parse(queryResults);
+  //         const arrayOfArticles = parsedQueryResults.value;
           
-          return _.reduce(arrayOfArticles, (articles, currArticle) => {
-            if (currArticle.image) {
-              const parsedObject = parseArticleObject(currArticle, keyword);
-              articles.push(parsedObject);
-            }
-            return articles;
-          }, []);
-        } 
-        else return null;
-      })
-      .then(arrayOfArticles => {
-        if (arrayOfArticles) {
-          for (const article of arrayOfArticles) {
-            db.saveIntoDatabase(article);
-          }
-          resp.writeHead(201, {"Content-Type": "text/plain"});
-          resp.end('Success');
-        }
-      })
-      .catch(err => new Error(err));
-  }
+  //         return _.reduce(arrayOfArticles, (articles, currArticle) => {
+  //           if (currArticle.image) {
+  //             const parsedObject = parseArticleObject(currArticle, keyword);
+  //             articles.push(parsedObject);
+  //           }
+  //           return articles;
+  //         }, []);
+  //       } 
+  //       else return null;
+  //     })
+  //     .then(arrayOfArticles => {
+  //       console.log('ARRAY')
+  //       console.log(arrayOfArticles)
+  //       if (arrayOfArticles) {
+  //         for (const article of arrayOfArticles) {
+  //           db.saveIntoDatabase(article);
+  //         }
+  //         resp.writeHead(201, {"Content-Type": "text/plain"});
+  //         resp.end('Success');
+  //       }
+  //     })
+  //     .catch(err => new Error(err));
+  // }
 };
 
 

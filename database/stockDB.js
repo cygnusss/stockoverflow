@@ -19,7 +19,7 @@ const Stock = mongoose.model('Stock', stockSchema);
 const searchDatabase = targetStock => {
   return mongoose
     .model('Stock')
-    .findOne({name: targetStock.name, priceDate: targetStock.priceDate})
+    .find({name: targetStock.name, priceDate: targetStock.priceDate})
     .exec();
 };
 
@@ -45,13 +45,17 @@ const createNewstock = inputStock => {
 
 // FUNCTION SAVES A STOCK INTO DATABASE
 const saveIntoDatabase = inputStock => {
-  searchDatabase(inputStock)
-  .then(found => {
-    if (!found) {
-      const newstock = createNewstock(inputStock);
-      newstock.save();
-    }
-  })
+  console.log("INPUT STOCK IS");
+  console.log(inputStock)
+  return searchDatabase(inputStock)
+    .then(results => {
+      if (!results.length) {
+        const newstock = createNewstock(inputStock);
+        newstock.save();
+      } else {
+        return results;
+      }
+    })
 };
 
 module.exports.Stock = Stock;

@@ -7,6 +7,7 @@ const mongoose = require('mongoose');
 const path = require('path');
 const cors = require('cors');
 const dist = path.resolve(__dirname, './../react-client/dist')
+const port = process.env.PORT || 8080
 // PROBABLY POINTLESS
 // const stockDB = require('./database/stockDB.js'); db
 mongoose.connect('mongodb://localhost/stockmarket', {useMongoClient: true});
@@ -29,6 +30,6 @@ app.post('/renderStock',  (req, resp) => stockmarketController.post(req, resp));
 app.get('/renderNews', (req, resp) => bingSearchController.get(req, resp));
 app.post('/renderNews',  (req, resp) => bingSearchController.post(req, resp));
 
-app.listen(8080, () => {
+app.listen(PORT, () => {
 	console.log('listening to 8080');
 });

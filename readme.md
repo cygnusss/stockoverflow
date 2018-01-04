@@ -1,5 +1,5 @@
 **************************************
 
-this app searches latest stock pricec
+this app searches latest stock prices
 
 **************************************
